@@ -1,5 +1,27 @@
-import { createApp } from 'vue'
-import './style.css'
-import App from './App.vue'
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router";
+import { createPinia } from "pinia";
 
-createApp(App).mount('#app')
+// Vuetify
+import "vuetify/styles";
+import "@mdi/font/css/materialdesignicons.css";
+import { createVuetify } from "vuetify";
+import * as components from "vuetify/components";
+import * as directives from "vuetify/directives";
+import { es } from "vuetify/locale";
+
+const vuetify = createVuetify({
+  components,
+  directives,
+  locale: {
+    locale: "es",
+    messages: { es },
+  },
+});
+
+const app = createApp(App);
+app.use(createPinia());
+app.use(router);
+app.use(vuetify);
+app.mount("#app");
