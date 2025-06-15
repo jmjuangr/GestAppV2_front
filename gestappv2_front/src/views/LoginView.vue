@@ -33,7 +33,7 @@ const store = useGestAppStore();
 const login = async () => {
   try {
     await store.login(nombre.value, pass.value);
-    if (store.usuario?.admin) {
+    if (store.usuario?.rol === "Admin") {
       router.push("/admin");
     } else {
       router.push("/user");

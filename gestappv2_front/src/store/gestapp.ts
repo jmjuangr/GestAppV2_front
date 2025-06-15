@@ -1,4 +1,3 @@
-// src/store/gestapp.ts
 import { defineStore } from "pinia";
 
 const BASE_URL = "http://localhost:8870/api";
@@ -41,7 +40,7 @@ export interface UsuarioLoginResponse {
   token: string;
   usuario: {
     nombre: string;
-    admin: boolean;
+    rol: string; // ← Aquí usamos rol como string
   };
 }
 
@@ -57,12 +56,12 @@ export const useGestAppStore = defineStore("gestapp", {
   actions: {
     // --- Productos ---
     async fetchProductos() {
-      const res = await fetch(`${BASE_URL}/producto`);
+      const res = await fetch(`${BASE_URL}/productos`);
       this.productos = await res.json();
     },
 
     async addProducto(dto: ProductoCreateDTO) {
-      const res = await fetch(`${BASE_URL}/producto`, {
+      const res = await fetch(`${BASE_URL}/productos`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +76,7 @@ export const useGestAppStore = defineStore("gestapp", {
 
     // --- Pedidos ---
     async addPedido(productosIds: number[]) {
-      const res = await fetch(`${BASE_URL}/pedido`, {
+      const res = await fetch(`${BASE_URL}/pedidos`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -91,7 +90,7 @@ export const useGestAppStore = defineStore("gestapp", {
     },
 
     async fetchPedidos() {
-      const res = await fetch(`${BASE_URL}/pedido`, {
+      const res = await fetch(`${BASE_URL}/pedidos`, {
         headers: {
           Authorization: `Bearer ${this.token}`,
         },
@@ -101,7 +100,7 @@ export const useGestAppStore = defineStore("gestapp", {
 
     // --- Facturas ---
     async addFactura(idPedido: number) {
-      const res = await fetch(`${BASE_URL}/factura`, {
+      const res = await fetch(`${BASE_URL}/facturas`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -115,7 +114,7 @@ export const useGestAppStore = defineStore("gestapp", {
     },
 
     async fetchFacturas() {
-      const res = await fetch(`${BASE_URL}/factura`, {
+      const res = await fetch(`${BASE_URL}/facturas`, {
         headers: {
           Authorization: `Bearer ${this.token}`,
         },
@@ -138,6 +137,11 @@ export const useGestAppStore = defineStore("gestapp", {
       const data: UsuarioLoginResponse = await res.json();
       this.token = data.token;
       this.usuario = data.usuario;
+
+      // Precargar datos protegidos si hay token
+      await this.fetchProductos();
+      await this.fetchPedidos();
+      await this.fetchFacturas();
     },
 
     logout() {

@@ -1,46 +1,62 @@
 <template>
-  <v-container class="mt-5" max-width="400">
-    <v-card>
-      <v-card-title>Registro</v-card-title>
-      <v-card-text>
+  <v-container>
+    <v-row justify="center">
+      <v-col cols="12" md="6">
+        <h2 class="text-h5 text-center mb-4">Registro de usuario</h2>
         <v-form @submit.prevent="registrar">
-          <v-text-field label="Nombre de usuario" v-model="nombre" required />
+          <v-text-field v-model="nombre" label="Nombre de usuario" required />
           <v-text-field
+            v-model="pass"
             label="Contraseña"
             type="password"
-            v-model="pass"
             required
           />
-          <v-btn type="submit" color="primary" class="mt-3">Registrarse</v-btn>
+          <v-btn type="submit" color="primary" class="mt-2" block>
+            Registrarse
+          </v-btn>
+
+          <v-alert v-if="mensaje" type="success" class="mt-4">
+            {{ mensaje }}
+          </v-alert>
+          <v-alert v-if="error" type="error" class="mt-4">
+            {{ error }}
+          </v-alert>
         </v-form>
-        <div v-if="mensaje" class="mt-3">{{ mensaje }}</div>
-      </v-card-text>
-    </v-card>
+      </v-col>
+    </v-row>
   </v-container>
 </template>
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRouter } from "vue-router";
 import { useGestAppStore } from "../store/gestapp";
 
 const store = useGestAppStore();
+const router = useRouter();
 
 const nombre = ref("");
 const pass = ref("");
+const rol = ref("User"); // Por defecto
+
 const mensaje = ref("");
+const error = ref("");
 
 const registrar = async () => {
+  error.value = "";
   try {
     await store.registerUsuario({
       nombre: nombre.value,
       pass: pass.value,
-      rol: "User",
+      rol: rol.value,
     });
-    mensaje.value = "Usuario registrado correctamente.";
-    nombre.value = "";
-    pass.value = "";
-  } catch (error) {
-    mensaje.value = "Error al registrar usuario.";
+    mensaje.value = "Usuario registrado correctamente. Redirigiendo...";
+
+    setTimeout(() => {
+      router.push("/login");
+    }, 1500);
+  } catch (err: any) {
+    error.value = err.message || "Error al registrar";
   }
 };
 </script>
